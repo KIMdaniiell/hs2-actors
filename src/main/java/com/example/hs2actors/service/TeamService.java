@@ -15,6 +15,8 @@ import com.example.hs2actors.repository.TeamRepository;
 import com.example.hs2actors.util.GeneralService;
 import com.example.hs2actors.util.Mapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,12 @@ public class TeamService extends GeneralService<Team, TeamDTO> {
     private final TeamManagerService teamManagerService;
     private final PlayerService playerService;
 
+    @Autowired
+    public TeamService(@Lazy TeamManagerService teamManagerService, @Lazy PlayerService playerService, @Lazy TeamRepository teamRepository) {
+        this.teamManagerService = teamManagerService;
+        this.teamRepository = teamRepository;
+        this.playerService = playerService;
+    }
 
     @Transactional
     public void addMember(long teamId, long playerId, Long teamManagerId) {

@@ -13,6 +13,8 @@ import com.example.hs2actors.repository.UserRepository;
 import com.example.hs2actors.util.GeneralService;
 import com.example.hs2actors.util.Mapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,13 @@ public class UserService extends GeneralService<User, UserDTO>
     private final UserRepository userRepository;
     private final PlayerService playerService;
     private final TeamManagerService teamManagerService;
+
+    @Autowired
+    public UserService(@Lazy PlayerService playerService, @Lazy TeamManagerService teamManagerService, @Lazy UserRepository userRepository) {
+        this.playerService = playerService;
+        this.userRepository = userRepository;
+        this.teamManagerService = teamManagerService;
+    }
 
     @Override
     public UserDTO create(UserDTO dto) {
