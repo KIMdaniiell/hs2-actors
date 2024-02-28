@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,14 +25,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserService extends GeneralService<User, UserDTO>
-//        implements UserDetailsService
-{
-
+public class UserService extends GeneralService<User, UserDTO> /*implements UserDetailsService*/ {
     private final Mapper<User, UserDTO> mapper = new UserMapper();
+
     private final UserRepository userRepository;
     private final PlayerService playerService;
     private final TeamManagerService teamManagerService;
+
 
     @Autowired
     public UserService(@Lazy PlayerService playerService, @Lazy TeamManagerService teamManagerService, @Lazy UserRepository userRepository) {
@@ -40,11 +40,17 @@ public class UserService extends GeneralService<User, UserDTO>
         this.teamManagerService = teamManagerService;
     }
 
+
     @Override
     public UserDTO create(UserDTO dto) {
         if (userRepository.findByUsername(dto.getLogin()).isPresent()) {
             throw new UserAlreadyExistsException(dto.getLogin());
         }
+
+        dto.setPassword(
+                new BCryptPasswordEncoder().encode(dto.getPassword())
+        );
+
         return super.create(dto);
     }
 
@@ -78,11 +84,11 @@ public class UserService extends GeneralService<User, UserDTO>
         Role role = roleDTO.getRole();
         if (deleteSideEntity) {
             switch (role) {
-                case PLAYER -> {
+                case ROLE_PLAYER -> {
                     long playerId = playerService.findPlayerIdByUser(id);
                     playerService.delete(playerId);
                 }
-                case TEAM_MANAGER -> {
+                case ROLE_TEAM_MANAGER -> {
                     long managerId = teamManagerService.findTeamManagerIdByUser(id);
                     teamManagerService.delete(managerId);
                 }
@@ -101,7 +107,7 @@ public class UserService extends GeneralService<User, UserDTO>
     }
 
     private boolean isRoleNotAllowedGrantManually(Role role) {
-        return role == Role.PLAYER || role == Role.TEAM_MANAGER;
+        return role == Role.ROLE_PLAYER || role == Role.ROLE_TEAM_MANAGER;
     }
 
     @Override
