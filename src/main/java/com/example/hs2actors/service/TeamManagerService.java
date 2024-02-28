@@ -18,17 +18,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class TeamManagerService extends GeneralService<TeamManager, TeamManagerDTO> {
+    private final Mapper<TeamManager, TeamManagerDTO> mapper = new TeamManagerMapper();
 
     private final TeamManagerRepository repository;
     private final UserService userService;
-    private final Mapper<TeamManager, TeamManagerDTO> mapper = new TeamManagerMapper();
+
 
     @Transactional
     @Override
     public TeamManagerDTO create(TeamManagerDTO dto) {
         long id = dto.getUserId();
         TeamManagerDTO createdDto = super.create(dto);
-        userService.addRole(id, new RoleDTO(Role.TEAM_MANAGER), true);
+        userService.addRole(id, new RoleDTO(Role.ROLE_TEAM_MANAGER), true);
         return createdDto;
     }
 
@@ -36,7 +37,7 @@ public class TeamManagerService extends GeneralService<TeamManager, TeamManagerD
     @Override
     public void delete(long id) {
         User user = getEntityById(id).getUser();
-        userService.removeRole(user.getUserId(), new RoleDTO(Role.TEAM_MANAGER), false);
+        userService.removeRole(user.getUserId(), new RoleDTO(Role.ROLE_TEAM_MANAGER), false);
         super.delete(id);
     }
 
