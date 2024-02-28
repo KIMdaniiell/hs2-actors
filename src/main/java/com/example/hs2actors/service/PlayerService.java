@@ -1,6 +1,8 @@
 package com.example.hs2actors.service;
 
-import com.example.hs2actors.controller.exceptions.not_found.*;
+import com.example.hs2actors.controller.exceptions.not_found.NotFoundException;
+import com.example.hs2actors.controller.exceptions.not_found.PlayerNotFoundException;
+import com.example.hs2actors.controller.exceptions.not_found.PlaygroundNotFoundException;
 import com.example.hs2actors.model.dto.PlayerDTO;
 import com.example.hs2actors.model.dto.RoleDTO;
 import com.example.hs2actors.model.entity.Player;
@@ -17,24 +19,26 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class PlayerService extends GeneralService<Player, PlayerDTO> {
-
     private final Mapper<Player, PlayerDTO> mapper = new PlayerMapper();
+
     private final PlayerRepository playerRepository;
     private final UserService userService;
     private final TeamService teamService;
+
+
 
     @Override
     public PlayerDTO create(PlayerDTO dto) {
         long id = dto.getUserId();
         PlayerDTO createdDto = super.create(dto);
-        userService.addRole(id, new RoleDTO(Role.PLAYER), true);
+        userService.addRole(id, new RoleDTO(Role.ROLE_PLAYER), true);
         return createdDto;
     }
 
     @Override
     public void delete(long id) {
         User user = getEntityById(id).getUser();
-        userService.removeRole(user.getUserId(), new RoleDTO(Role.PLAYER), false);
+        userService.removeRole(user.getUserId(), new RoleDTO(Role.ROLE_PLAYER), false);
         super.delete(id);
     }
 
