@@ -1,0 +1,36 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="kimdaniiell@gmail.com" id="2024-02-27-insert-team-data-1">
+        <insert tableName="team">
+            <column name="is_free_to_join" value="true"/>
+            <column name="team_size" value="10"/>
+            <column name="team_name" value="!!Team #10!!"/>
+            <column name="manager_id" valueComputed="(SELECT team_manager_id FROM team_manager WHERE email='manager1@email.ru')"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="kimdaniiell@gmail.com" id="2024-02-27-insert-team-data-2">
+        <insert tableName="team">
+            <column name="is_free_to_join" value="true"/>
+            <column name="team_size" value="20"/>
+            <column name="team_name" value="-=Team №22=-"/>
+            <column name="manager_id" valueComputed="(SELECT team_manager_id FROM team_manager WHERE email='manager2@email.ru')"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="kimdaniiell@gmail.com" id="2024-02-27-insert-team-data-3">
+        <insert tableName="team">
+            <column name="is_free_to_join" value="true"/>
+            <column name="team_size" value="30"/>
+            <column name="team_name" value="Team #333!! XD"/>
+            <column name="manager_id" valueComputed="(SELECT team_manager_id FROM team_manager WHERE email='manager3@email.ru')"/>
+        </insert>
+    </changeSet>
+
+
+</databaseChangeLog>
+
