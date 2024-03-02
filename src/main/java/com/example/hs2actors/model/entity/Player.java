@@ -43,9 +43,12 @@ public class Player {
     @Column(name = "gender", nullable = false, length = 16)
     private Gender gender;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    //    @OneToOne
+    //    @JoinColumn(name = "user_id")
+    //    private User user;
+    @Column(name = "user_id")
+    private Long userId;
+
 
     @ManyToMany(mappedBy = "players")
     private List<Team> teams;

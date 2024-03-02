@@ -12,7 +12,7 @@
             <column name="weight_kg" value="84"/>
             <column name="first_name" value="Ivanov"/>
             <column name="last_name" value="Mihail"/>
-            <column name="user_id" valueComputed="(SELECT user_id FROM users WHERE username='TEST_PLAYER_1')"/>
+            <column name="user_id" value="2"/>
         </insert>
     </changeSet>
 
@@ -24,7 +24,7 @@
             <column name="weight_kg" value="91"/>
             <column name="first_name" value="Gleb"/>
             <column name="last_name" value="Potter"/>
-            <column name="user_id" valueComputed="(SELECT user_id FROM users WHERE username='TEST_PLAYER_2')"/>
+            <column name="user_id" value="9"/>
         </insert>
     </changeSet>
 
@@ -36,7 +36,7 @@
             <column name="weight_kg" value="78"/>
             <column name="first_name" value="Alina"/>
             <column name="last_name" value="Valentinovna"/>
-            <column name="user_id" valueComputed="(SELECT user_id FROM users WHERE username='TEST_PLAYER_3')"/>
+            <column name="user_id" value="10"/>
         </insert>
     </changeSet>
 

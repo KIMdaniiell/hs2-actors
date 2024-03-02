@@ -2,13 +2,13 @@ package com.example.hs2actors.service;
 
 import com.example.hs2actors.controller.exceptions.not_found.NotFoundException;
 import com.example.hs2actors.controller.exceptions.not_found.PlayerNotFoundException;
-import com.example.hs2actors.controller.exceptions.not_found.PlaygroundNotFoundException;
 import com.example.hs2actors.model.dto.PlayerDTO;
 import com.example.hs2actors.model.dto.RoleDTO;
 import com.example.hs2actors.model.entity.Player;
 import com.example.hs2actors.model.entity.Role;
-import com.example.hs2actors.model.entity.User;
 import com.example.hs2actors.repository.PlayerRepository;
+import com.example.hs2actors.service.feign.AuthClientAddRoleWrapper;
+import com.example.hs2actors.service.feign.AuthClientRemoveRoleWrapper;
 import com.example.hs2actors.util.GeneralService;
 import com.example.hs2actors.util.Mapper;
 import lombok.RequiredArgsConstructor;
@@ -21,36 +21,51 @@ import org.springframework.transaction.annotation.Transactional;
 public class PlayerService extends GeneralService<Player, PlayerDTO> {
     private final Mapper<Player, PlayerDTO> mapper = new PlayerMapper();
 
-    private final PlayerRepository playerRepository;
-    private final UserService userService;
+    private final PlayerRepository repository;
     private final TeamService teamService;
-
+    private final AuthClientAddRoleWrapper authClientAddRoleWrapper;
+    private final AuthClientRemoveRoleWrapper authClientRemoveRoleWrapper;
 
 
     @Override
     public PlayerDTO create(PlayerDTO dto) {
-        long id = dto.getUserId();
+        // Шаг 1: ассоциированному с Player`ому User'у назначается роль ROLE_PLAYER
+        authClientAddRoleWrapper.addRole(
+                dto.getUserId(),
+                new RoleDTO(Role.ROLE_PLAYER));
+
+        // Шаг 2: при успешном назначении роли Player сохраняется
         PlayerDTO createdDto = super.create(dto);
-        userService.addRole(id, new RoleDTO(Role.ROLE_PLAYER), true);
+
         return createdDto;
     }
 
     @Override
     public void delete(long id) {
-        User user = getEntityById(id).getUser();
-        userService.removeRole(user.getUserId(), new RoleDTO(Role.ROLE_PLAYER), false);
+        // Шаг 1: с ассоциированного с Player`ом User'а снять роль ROLE_PLAYER
+        authClientRemoveRoleWrapper.removeRole(
+                getEntityById(id).getUserId(),
+                new RoleDTO(Role.ROLE_PLAYER));
+        // Шаг 2: при успешном удалении роли Player удаляется
         super.delete(id);
     }
 
     @Transactional
     public PlayerDTO update(long id, PlayerDTO dto) {
-        Player found = getEntityById(id);
-        Player updated = mapper.dtoToEntity(dto);
-        updated.setPlayerId(found.getPlayerId());
-        updated.setUser(found.getUser());
-        updated.setTeams(found.getTeams());
-        playerRepository.save(updated);
-        return mapper.entityToDto(updated);
+        Player player = getEntityById(id);
+
+        // TODO если поле null, то наверное не нужно обновлять?
+        player.setFirstName(dto.getFirstName());
+        player.setLastName(dto.getLastName());
+        player.setAge(dto.getAge());
+        player.setHeight(dto.getHeightCm());
+        player.setWeight(dto.getWeightKg());
+        player.setGender(dto.getGender());
+        // userId - не обновляется
+        // teams - не обновляется
+        repository.save(player);
+
+        return mapper.entityToDto(player);
     }
 
     public void joinTeam(long playerId, long teamId) {
@@ -61,14 +76,15 @@ public class PlayerService extends GeneralService<Player, PlayerDTO> {
         teamService.removeMember(teamId, playerId, null);
     }
 
-    public long findPlayerIdByUser(long userId) {
-        return playerRepository.findByUser_UserId(userId)
+    public long findPlayerIdByUserId(long userId) {
+        return repository.findPlayerByUserId(userId)
                 .orElseThrow(() -> new PlayerNotFoundException("user id = " + userId)).getPlayerId();
     }
 
+
     @Override
     protected NotFoundException getNotFoundIdException(long id) {
-        return new PlaygroundNotFoundException("id = " + id);
+        return new PlayerNotFoundException("id = " + id);
     }
 
     @Override
@@ -78,7 +94,7 @@ public class PlayerService extends GeneralService<Player, PlayerDTO> {
 
     @Override
     protected JpaRepository<Player, Long> getRepository() {
-        return playerRepository;
+        return repository;
     }
 
     class PlayerMapper implements Mapper<Player, PlayerDTO> {
@@ -87,7 +103,7 @@ public class PlayerService extends GeneralService<Player, PlayerDTO> {
         public PlayerDTO entityToDto(Player entity) {
             return new PlayerDTO(
                     entity.getPlayerId(),
-                    entity.getUser().getUserId(),
+                    entity.getUserId(),
                     entity.getFirstName(),
                     entity.getLastName(),
                     entity.getAge(),
@@ -99,8 +115,6 @@ public class PlayerService extends GeneralService<Player, PlayerDTO> {
 
         @Override
         public Player dtoToEntity(PlayerDTO dto) {
-            User user = userService.getEntityById(dto.getUserId());
-
             return new Player(
                     null,
                     dto.getFirstName(),
@@ -109,7 +123,7 @@ public class PlayerService extends GeneralService<Player, PlayerDTO> {
                     dto.getHeightCm(),
                     dto.getWeightKg(),
                     dto.getGender(),
-                    user,
+                    dto.getUserId(),
                     null
             );
         }

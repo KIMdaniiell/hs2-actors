@@ -31,9 +31,11 @@ public class TeamManager {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    //    @OneToOne
+    //    @JoinColumn(name = "user_id")
+    //    private User user;
+    @Column(name = "user_id")
+    private Long userId;
 
     @OneToMany(mappedBy = "manager")
     private List<Team> teams;

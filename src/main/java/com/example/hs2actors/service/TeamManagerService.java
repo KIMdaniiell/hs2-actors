@@ -6,8 +6,9 @@ import com.example.hs2actors.model.dto.RoleDTO;
 import com.example.hs2actors.model.dto.TeamManagerDTO;
 import com.example.hs2actors.model.entity.Role;
 import com.example.hs2actors.model.entity.TeamManager;
-import com.example.hs2actors.model.entity.User;
 import com.example.hs2actors.repository.TeamManagerRepository;
+import com.example.hs2actors.service.feign.AuthClientAddRoleWrapper;
+import com.example.hs2actors.service.feign.AuthClientRemoveRoleWrapper;
 import com.example.hs2actors.util.GeneralService;
 import com.example.hs2actors.util.Mapper;
 import lombok.RequiredArgsConstructor;
@@ -21,42 +22,57 @@ public class TeamManagerService extends GeneralService<TeamManager, TeamManagerD
     private final Mapper<TeamManager, TeamManagerDTO> mapper = new TeamManagerMapper();
 
     private final TeamManagerRepository repository;
-    private final UserService userService;
+    private final AuthClientAddRoleWrapper authClientAddRoleWrapper;
+    private final AuthClientRemoveRoleWrapper authClientRemoveRoleWrapper;
 
 
     @Transactional
     @Override
     public TeamManagerDTO create(TeamManagerDTO dto) {
-        long id = dto.getUserId();
+        // Шаг 1: ассоциированному с TeamManager`ом User'у назначается роль ROLE_TEAM_MANAGER
+        authClientAddRoleWrapper.addRole(
+                dto.getUserId(),
+                new RoleDTO(Role.ROLE_TEAM_MANAGER));
+
+        // Шаг 2: при успешном назначении роли Player сохраняется
         TeamManagerDTO createdDto = super.create(dto);
-        userService.addRole(id, new RoleDTO(Role.ROLE_TEAM_MANAGER), true);
+
         return createdDto;
     }
 
     @Transactional
     @Override
     public void delete(long id) {
-        User user = getEntityById(id).getUser();
-        userService.removeRole(user.getUserId(), new RoleDTO(Role.ROLE_TEAM_MANAGER), false);
+        // Шаг 1: с ассоциированного с TeamManager`ом User'а снять роль ROLE_TEAM_MANAGER
+        authClientRemoveRoleWrapper.removeRole(
+                getEntityById(id).getUserId(),
+                new RoleDTO(Role.ROLE_TEAM_MANAGER));
+        // Шаг 2: при успешном удалении роли TeamManager удаляется
         super.delete(id);
     }
 
     @Transactional
     public TeamManagerDTO update(long id, TeamManagerDTO dto) {
-        TeamManager found = getEntityById(id);
-        TeamManager updated = mapper.dtoToEntity(dto);
-        updated.setTeamManagerId(id);
-        updated.setUser(found.getUser());
-        updated.setTeams(found.getTeams());
-        repository.save(updated);
-        return mapper.entityToDto(updated);
+        TeamManager manager = getEntityById(id);
+
+        // TODO если поле null, то наверное не нужно обновлять?
+        manager.setFirstName(dto.getFirstName());
+        manager.setLastName(dto.getLastName());
+        manager.setPhone(dto.getPhone());
+        manager.setEmail(dto.getEmail());
+        // userId - не обновляется
+        // teams - не обновляется
+        repository.save(manager);
+
+        return mapper.entityToDto(manager);
     }
 
-    public long findTeamManagerIdByUser(long userId) {
-        return repository.findByUser_UserId(userId)
+    public long findTeamManagerIdByUserId(long userId) {
+        return repository.findByUserId(userId)
                 .orElseThrow(() -> new TeamManagerNotFoundException("user id = " + userId))
                 .getTeamManagerId();
     }
+
 
     @Override
     protected NotFoundException getNotFoundIdException(long id) {
@@ -79,7 +95,7 @@ public class TeamManagerService extends GeneralService<TeamManager, TeamManagerD
         public TeamManagerDTO entityToDto(TeamManager entity) {
             return new TeamManagerDTO(
                     entity.getTeamManagerId(),
-                    entity.getUser().getUserId(),
+                    entity.getUserId(),
                     entity.getFirstName(),
                     entity.getLastName(),
                     entity.getPhone(),
@@ -89,14 +105,13 @@ public class TeamManagerService extends GeneralService<TeamManager, TeamManagerD
 
         @Override
         public TeamManager dtoToEntity(TeamManagerDTO dto) {
-            User user = userService.getEntityById(dto.getUserId());
             return new TeamManager(
                     null,
                     dto.getFirstName(),
                     dto.getLastName(),
                     dto.getPhone(),
                     dto.getEmail(),
-                    user,
+                    dto.getUserId(),
                     null
             );
         }

@@ -67,36 +67,16 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="liquibase (generated)" id="1709021791574-4">
-        <createTable tableName="users">
-            <column autoIncrement="true" name="user_id" startWith="2" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="users_pkey"/>
-            </column>
-            <column name="password" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="username" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-    <changeSet author="liquibase (generated)" id="1709021791574-5">
-        <createTable tableName="user_roles">
-            <column name="user_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="role" type="VARCHAR(255)"/>
-        </createTable>
-    </changeSet>
+
+
     <changeSet author="liquibase (generated)" id="1709021791574-6">
         <addUniqueConstraint columnNames="user_id" constraintName="player_user_id_key" tableName="player"/>
     </changeSet>
+
     <changeSet author="liquibase (generated)" id="1709021791574-7">
         <addUniqueConstraint columnNames="user_id" constraintName="team_manager_user_id_key" tableName="team_manager"/>
     </changeSet>
-    <changeSet author="liquibase (generated)" id="1709021791574-8">
-        <addUniqueConstraint columnNames="username" constraintName="users_username_key" tableName="users"/>
-    </changeSet>
+
     <changeSet author="liquibase (generated)" id="1709021791574-9">
         <createTable tableName="players_teams">
             <column name="player_id" type="BIGINT">
@@ -107,22 +87,27 @@
             </column>
         </createTable>
     </changeSet>
+
     <changeSet author="liquibase (generated)" id="1709021791574-10">
-        <addForeignKeyConstraint baseColumnNames="manager_id" baseTableName="team" constraintName="fk34ryo1fstmy8lm7irv35pnuvo" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="team_manager_id" referencedTableName="team_manager" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="manager_id" baseTableName="team"
+                                 constraintName="fk34ryo1fstmy8lm7irv35pnuvo" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="team_manager_id" referencedTableName="team_manager"
+                                 validate="true"/>
     </changeSet>
-    <changeSet author="liquibase (generated)" id="1709021791574-11">
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="team_manager" constraintName="fkf1fm9vl3y8oqjhkpceg4iicta" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="user_id" referencedTableName="users" validate="true"/>
-    </changeSet>
-    <changeSet author="liquibase (generated)" id="1709021791574-12">
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_roles" constraintName="fkhfh9dx7w3ubf1co1vdev94g3f" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="user_id" referencedTableName="users" validate="true"/>
-    </changeSet>
+
     <changeSet author="liquibase (generated)" id="1709021791574-13">
-        <addForeignKeyConstraint baseColumnNames="player_id" baseTableName="players_teams" constraintName="fkk4d7i4a174v2ciftt7rw68xje" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="player_id" referencedTableName="player" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="player_id" baseTableName="players_teams"
+                                 constraintName="fkk4d7i4a174v2ciftt7rw68xje" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="player_id" referencedTableName="player" validate="true"/>
     </changeSet>
-    <changeSet author="liquibase (generated)" id="1709021791574-14">
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="player" constraintName="fkoycxb69gpaapuv23fn52y0g50" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="user_id" referencedTableName="users" validate="true"/>
-    </changeSet>
+
     <changeSet author="liquibase (generated)" id="1709021791574-15">
-        <addForeignKeyConstraint baseColumnNames="team_id" baseTableName="players_teams" constraintName="fkp6kofd88c359uwkb3nta5svnv" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="team_id" referencedTableName="team" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="team_id" baseTableName="players_teams"
+                                 constraintName="fkp6kofd88c359uwkb3nta5svnv" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="team_id" referencedTableName="team" validate="true"/>
     </changeSet>
+
 </databaseChangeLog>
