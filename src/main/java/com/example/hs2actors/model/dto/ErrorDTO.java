@@ -12,8 +12,8 @@ import java.util.List;
 public class ErrorDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private final LocalDateTime timestamp;
-    private final String message;
     private final String error;
+    private final String message;
     private List<ViolationDTO> violations;
 
     public ErrorDTO(LocalDateTime timestamp, String message, String error) {

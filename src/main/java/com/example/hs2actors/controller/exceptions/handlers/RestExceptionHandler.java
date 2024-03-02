@@ -6,6 +6,7 @@ import com.example.hs2actors.model.dto.ErrorDTO;
 import com.example.hs2actors.model.dto.ViolationDTO;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -67,6 +68,19 @@ public class RestExceptionHandler {
                 "Body of request isn't valid. See violation list.",
                 "Validation failed",
                 violations
+        );
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    protected ErrorDTO handleConversionFail(HttpMessageNotReadableException e) {
+
+        return new ErrorDTO(
+                LocalDateTime.now(),
+                "Conversion failed",
+                e.getMessage(),
+                null
         );
     }
 
