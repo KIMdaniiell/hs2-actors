@@ -1,10 +1,11 @@
+server:
+  port: 9012
+
 spring:
   application:
     name: actors-service
   profiles:
-    active: dev
+    active: LOCAL
   config:
-    import: configserver:http://localhost:8888/
-
-server:
-  port: 8082
+    import: configserver:http://configuration-server:8888/
+    # 'configuration-server' - is a container name (see more about Docker's networks DNS...)
