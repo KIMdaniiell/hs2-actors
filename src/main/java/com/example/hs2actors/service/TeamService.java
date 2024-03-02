@@ -27,15 +27,17 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+
 @Service
 @RequiredArgsConstructor
 public class TeamService extends GeneralService<Team, TeamDTO> {
     private final static long DEFAULT_TEAM_SIZE = 10;
-
     private final Mapper<Team, TeamDTO> mapper = new TeamMapper();
+
     private final TeamRepository teamRepository;
     private final TeamManagerService teamManagerService;
     private final PlayerService playerService;
+
 
     @Autowired
     public TeamService(@Lazy TeamManagerService teamManagerService, @Lazy PlayerService playerService, @Lazy TeamRepository teamRepository) {
@@ -118,6 +120,7 @@ public class TeamService extends GeneralService<Team, TeamDTO> {
                 .map(mapper::entityToDto)
                 .toList();
     }
+
 
     @Override
     protected NotFoundException getNotFoundIdException(long id) {
