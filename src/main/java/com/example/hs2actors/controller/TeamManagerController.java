@@ -21,7 +21,7 @@ import static com.example.hs2actors.util.ValidationMessages.*;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/manager")
+@RequestMapping(path = "api/managers")
 public class TeamManagerController {
 
     private final TeamManagerService teamManagerService;

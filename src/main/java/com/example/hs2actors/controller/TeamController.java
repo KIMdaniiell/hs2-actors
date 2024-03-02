@@ -18,7 +18,7 @@ import static com.example.hs2actors.util.ValidationMessages.*;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/teams")
+@RequestMapping(path = "api/teams")
 public class TeamController {
 
     private final TeamService teamService;
