@@ -1,5 +1,6 @@
 package com.example.hs2actors.controller;
 
+import com.example.hs2actors.model.dto.MessageDTO;
 import com.example.hs2actors.model.dto.PlayerDTO;
 import com.example.hs2actors.model.dto.TeamDTO;
 import com.example.hs2actors.service.PlayerService;
@@ -21,13 +22,13 @@ import static com.example.hs2actors.util.ValidationMessages.*;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/players")
+@RequestMapping(path = "api/players")
 public class PlayerController {
 
     private final PlayerService playerService;
     private final TeamService teamService;
 
-    @GetMapping(value = "/")
+    @GetMapping(value = {"", "/"})
     public ResponseEntity<?> getAllPlayers(
             @RequestParam(value = "page", defaultValue = "0") @Min(value = 0, message = MSG_PAGE_NEGATIVE) int page,
             @RequestParam(value = "size", defaultValue = "5") @Min(value = 0, message = MSG_SIZE_NEGATIVE) @Max(value = 50, message = MSG_SIZE_TOO_BIG) int size
@@ -65,7 +66,11 @@ public class PlayerController {
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long playerId
     ) {
         playerService.delete(playerId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new MessageDTO(
+                        "Player deleted",
+                        "Player profile with id=%d no longer exist".formatted(playerId),
+                        null));
     }
 
     @GetMapping("/{playerId}/teams")
@@ -91,15 +96,13 @@ public class PlayerController {
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long teamId
     ) {
         playerService.leaveTeam(playerId, teamId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new MessageDTO(
+                        "Player leaved team",
+                        "Player with id=%d no longer belongs to team with id=%d"
+                                .formatted(playerId, teamId),
+                        null));
     }
-
-//    @GetMapping("/{playerId}/bookings")
-//    public ResponseEntity<?> getBookings(
-//            @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long playerId
-//    ) {
-//        List<BookingDTO> bookingDTOS = bookingService.getBookingsByPlayer(playerId);
-//        return ResponseEntity.ok(bookingDTOS);
-//    }
 
 }
