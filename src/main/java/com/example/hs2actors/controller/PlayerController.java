@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,9 @@ public class PlayerController {
 
     private final PlayerService playerService;
     private final TeamService teamService;
+
+
+    /* =====-----     Players     -----===== */
 
     @GetMapping(value = {"", "/"})
     public ResponseEntity<?> getAllPlayers(
@@ -51,8 +55,9 @@ public class PlayerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    //    supervisor role
+
     @PutMapping("/{playerId}")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public ResponseEntity<?> updatePlayer(
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long playerId,
             @Valid @RequestBody PlayerDTO playerDto
@@ -73,6 +78,10 @@ public class PlayerController {
                         null));
     }
 
+
+
+    /* =====-----     Players teams     -----===== */
+
     @GetMapping("/{playerId}/teams")
     public ResponseEntity<?> getTeamsOfPlayer(
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long playerId
@@ -82,6 +91,7 @@ public class PlayerController {
     }
 
     @PostMapping("/{playerId}/teams/{teamId}")
+    @PreAuthorize("hasAnyRole('PLAYER', 'TEAM_MANAGER')")
     public ResponseEntity<?> joinTeam(
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long playerId,
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long teamId
@@ -91,6 +101,7 @@ public class PlayerController {
     }
 
     @DeleteMapping("/{playerId}/teams/{teamId}")
+    @PreAuthorize("hasAnyRole('PLAYER', 'TEAM_MANAGER')")
     public ResponseEntity<?> leaveTeam(
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long playerId,
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long teamId

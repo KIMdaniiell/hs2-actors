@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,9 @@ public class TeamManagerController {
 
     private final TeamManagerService teamManagerService;
     private final TeamService teamService;
+
+
+    /* =====-----     Managers     -----===== */
 
     @GetMapping(value = "/")
     public ResponseEntity<?> getAllTeamManagers(@RequestParam(value = "page", defaultValue = "0") @Min(value = 0, message = MSG_PAGE_NEGATIVE) int page,
@@ -66,7 +70,12 @@ public class TeamManagerController {
         return ResponseEntity.ok(teamManagerDTO);
     }
 
+
+
+    /* =====-----     Managers teams     -----===== */
+
     @PostMapping(value = "/{managerId}/teams")
+    @PreAuthorize("hasRole('TEAM_MANAGER')")
     public ResponseEntity<?> createTeam(
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long managerId,
             @Valid @RequestBody TeamDTO teamDTO
@@ -77,6 +86,7 @@ public class TeamManagerController {
     }
 
     @DeleteMapping(value = "/{managerId}/teams/{teamId}")
+    @PreAuthorize("hasRole('TEAM_MANAGER')")
     public ResponseEntity<?> deleteTeam(
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long managerId,
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long teamId
@@ -86,6 +96,7 @@ public class TeamManagerController {
     }
 
     @PutMapping(value = "/{managerId}/teams/{teamId}")
+    @PreAuthorize("hasRole('TEAM_MANAGER')")
     public ResponseEntity<?> updateTeam(
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long managerId,
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long teamId,
@@ -112,5 +123,4 @@ public class TeamManagerController {
         TeamDTO teamDTO = teamService.getTeamByManager(managerId, teamId);
         return ResponseEntity.ok(teamDTO);
     }
-
 }

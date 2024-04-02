@@ -51,8 +51,10 @@ services:
     ports:
       - "${APP_PORT}:9012"
     networks:
-      internal-network:
       hls-lab-network:
+        priority: 100
+      internal-network:
+        priority: 1000
 
 networks:
   hls-lab-network: # Нужна для связи с другими сервисами проекта

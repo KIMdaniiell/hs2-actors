@@ -18,20 +18,19 @@ public class TeamManagerFeignController {
 
     private final TeamManagerService teamManagerService;
 
-
     @GetMapping()
     public ResponseEntity<?> findTeamManagerIdByUserId(
-            @RequestParam @Min(value = 0, message = MSG_ID_NEGATIVE) long userId
+            @RequestParam(value = "userId") @Min(value = 0, message = MSG_ID_NEGATIVE) long userId
     ) {
         long managerId = teamManagerService.findTeamManagerIdByUserId(userId);
         return ResponseEntity.ok(managerId);
     }
 
-    @DeleteMapping(value = "/{managerId}")
+    @DeleteMapping("/{managerId}")
     public ResponseEntity<?> deleteTeamManagerById(
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long managerId
     ) {
-        teamManagerService.delete(managerId);
+        teamManagerService.delete(managerId, false);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

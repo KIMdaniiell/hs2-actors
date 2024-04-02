@@ -13,12 +13,12 @@
 * предварительно должна быть создана docker сеть `hls-lab-network`
   для взаимодействия сервисов приложения:
 
-  ``docker create network hls-lab-network``
+  ``docker network create hls-lab-network``
 
 
 * предварительно должна быть создана docker сеть `z-actors-internal-network`
   для взаимодействия компонентов внутри микросервиса (*БД*, *liquidbase*, *spring приложение*):
 
-  ``docker create network z-actors-internal-network``
+  ``docker network create z-actors-internal-network``
 
 * иногда нужно снести БД (очищаем соответствующий volume) 

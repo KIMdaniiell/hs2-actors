@@ -30,6 +30,7 @@
             </column>
         </createTable>
     </changeSet>
+
     <changeSet author="liquibase (generated)" id="1709021791574-2">
         <createTable tableName="team">
             <column name="is_free_to_join" type="BOOLEAN">
@@ -47,6 +48,7 @@
             </column>
         </createTable>
     </changeSet>
+
     <changeSet author="liquibase (generated)" id="1709021791574-3">
         <createTable tableName="team_manager">
             <column autoIncrement="true" name="team_manager_id" type="BIGINT">

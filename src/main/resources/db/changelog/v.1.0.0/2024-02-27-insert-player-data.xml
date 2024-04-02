@@ -12,7 +12,7 @@
             <column name="weight_kg" value="84"/>
             <column name="first_name" value="Ivanov"/>
             <column name="last_name" value="Mihail"/>
-            <column name="user_id" value="2"/>
+            <column name="user_id" value="8"/>
         </insert>
     </changeSet>
 

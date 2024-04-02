@@ -19,6 +19,13 @@ public class PlayerFeignController {
 
     private final PlayerService playerService;
 
+    @GetMapping()
+    public ResponseEntity<?> getPlayerIdByUserId(
+            @RequestParam(value = "userId") @Min(value = 0, message = MSG_ID_NEGATIVE) long userId
+    ) {
+        long playerId = playerService.findPlayerIdByUserId(userId);
+        return ResponseEntity.ok(playerId);
+    }
 
     @GetMapping(value = "/{playerId}")
     public ResponseEntity<?> getPlayerById(
@@ -28,19 +35,11 @@ public class PlayerFeignController {
         return ResponseEntity.ok(playerDTO);
     }
 
-    @GetMapping()
-    public ResponseEntity<?> getPlayerIdByUserId(
-            @RequestParam @Min(value = 0, message = MSG_ID_NEGATIVE) long userId
-    ) {
-        long playerId = playerService.findPlayerIdByUserId(userId);
-        return ResponseEntity.ok(playerId);
-    }
-
     @DeleteMapping("/{playerId}")
     public ResponseEntity<?> deletePlayerById(
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long playerId
     ) {
-        playerService.delete(playerId);
+        playerService.delete(playerId, false);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

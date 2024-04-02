@@ -3,6 +3,7 @@ package com.example.hs2actors.service;
 import com.example.hs2actors.controller.exceptions.not_found.NotFoundException;
 import com.example.hs2actors.controller.exceptions.not_found.TeamManagerNotFoundException;
 import com.example.hs2actors.model.dto.RoleDTO;
+import com.example.hs2actors.model.dto.TeamDTO;
 import com.example.hs2actors.model.dto.TeamManagerDTO;
 import com.example.hs2actors.model.entity.Role;
 import com.example.hs2actors.model.entity.TeamManager;
@@ -16,12 +17,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TeamManagerService extends GeneralService<TeamManager, TeamManagerDTO> {
     private final Mapper<TeamManager, TeamManagerDTO> mapper = new TeamManagerMapper();
 
     private final TeamManagerRepository repository;
+    private final TeamService teamService;
     private final AuthClientAddRoleWrapper authClientAddRoleWrapper;
     private final AuthClientRemoveRoleWrapper authClientRemoveRoleWrapper;
 
@@ -43,11 +47,26 @@ public class TeamManagerService extends GeneralService<TeamManager, TeamManagerD
     @Transactional
     @Override
     public void delete(long id) {
-        // Шаг 1: с ассоциированного с TeamManager`ом User'а снять роль ROLE_TEAM_MANAGER
-        authClientRemoveRoleWrapper.removeRole(
-                getEntityById(id).getUserId(),
-                new RoleDTO(Role.ROLE_TEAM_MANAGER));
-        // Шаг 2: при успешном удалении роли TeamManager удаляется
+        delete(id, true);
+    }
+
+    @Transactional
+    public void delete(long id, boolean deleteSideEntity) {
+        if (deleteSideEntity) {
+            // Шаг 1: с ассоциированного с TeamManager`ом User'а снять роль ROLE_TEAM_MANAGER
+            authClientRemoveRoleWrapper.removeRole(
+                    getEntityById(id).getUserId(),
+                    new RoleDTO(Role.ROLE_TEAM_MANAGER));
+        }
+        // Шаг 2: при успешном удалении роли TeamManager удаляются команды
+        List<TeamDTO> managersTeams = teamService.getAllTeamsByManager(id);
+        System.out.println("[ManagerId] " + id);
+        for (TeamDTO teamDTO: managersTeams) {
+            teamService.delete(id, teamDTO.getTeamId());
+            System.out.println("\t┗━━━ [deleting TeamId] " + teamDTO.getTeamId());
+        }
+
+        // Шаг 3: при успешном удалении роли TeamManager удаляется
         super.delete(id);
     }
 

@@ -1,6 +1,7 @@
 package com.example.hs2actors.controller.exceptions.handlers;
 
 import com.example.hs2actors.controller.exceptions.ControllerException;
+import com.example.hs2actors.controller.exceptions.fallback.DubControllerException;
 import com.example.hs2actors.controller.exceptions.fallback.ServiceUnavailableException;
 import com.example.hs2actors.model.dto.ErrorDTO;
 import org.springframework.http.HttpStatus;
@@ -23,4 +24,14 @@ public class CircuitBreakingExceptionHandler {
         );
     }
 
+    @ExceptionHandler(DubControllerException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    protected ErrorDTO handleServiceException(ControllerException ex) {
+        return new ErrorDTO(
+                ex.getTimestamp(),
+                ex.getMessage(),
+                ex.getError()
+        );
+    }
 }

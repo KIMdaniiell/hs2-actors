@@ -42,10 +42,17 @@ public class PlayerService extends GeneralService<Player, PlayerDTO> {
 
     @Override
     public void delete(long id) {
-        // Шаг 1: с ассоциированного с Player`ом User'а снять роль ROLE_PLAYER
-        authClientRemoveRoleWrapper.removeRole(
-                getEntityById(id).getUserId(),
-                new RoleDTO(Role.ROLE_PLAYER));
+        delete(id, true);
+    }
+
+    public void delete(long id, boolean deleteSideEntity) {
+        if (deleteSideEntity) {
+            // Шаг 1: с ассоциированного с Player`ом User'а снять роль ROLE_PLAYER
+            authClientRemoveRoleWrapper.removeRole(
+                    getEntityById(id).getUserId(),
+                    new RoleDTO(Role.ROLE_PLAYER));
+        }
+
         // Шаг 2: при успешном удалении роли Player удаляется
         super.delete(id);
     }
