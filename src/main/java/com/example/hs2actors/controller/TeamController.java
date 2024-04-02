@@ -1,5 +1,6 @@
 package com.example.hs2actors.controller;
 
+import com.example.hs2actors.model.dto.PlayerDTO;
 import com.example.hs2actors.model.dto.TeamDTO;
 import com.example.hs2actors.service.TeamService;
 import jakarta.validation.Valid;

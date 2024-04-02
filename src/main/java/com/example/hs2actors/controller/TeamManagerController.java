@@ -54,6 +54,7 @@ public class TeamManagerController {
     }
 
     @DeleteMapping(value = "/{managerId}")
+    @PreAuthorize("hasRole('TEAM_MANAGER')")
     public ResponseEntity<?> deleteTeamManager(
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long managerId
     ) {
@@ -62,6 +63,7 @@ public class TeamManagerController {
     }
 
     @PutMapping(value = "/{managerId}")
+    @PreAuthorize("hasRole('TEAM_MANAGER')")
     public ResponseEntity<?> updateTeamManager(
             @PathVariable @Min(value = 0, message = MSG_ID_NEGATIVE) long managerId,
             @Valid @RequestBody TeamManagerDTO managerDto
